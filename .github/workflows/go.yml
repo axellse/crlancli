@@ -1,48 +1,53 @@
-name: Build Matrix
+name: build
+
+permissions:
+  contents: read
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }} ${{ matrix.arch }}
-    runs-on: ${{ matrix.os }}
+    name: build
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            goos: linux
-            arch: amd64
-          - os: ubuntu-latest
-            goos: linux
-            arch: arm64
-          - os: windows-latest
-            goos: windows
-            arch: amd64
-          - os: macos-latest
-            goos: darwin
-            arch: amd64
+        goos: [windows, linux, darwin]
+        goarch: [amd64, arm, arm64, 386]
+        exclude:
+          - goos: windows
+            goarch: arm
+          - goos: windows
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm
+          - goos: darwin
+            goarch: 386
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
-          cache: true
+          go-version: stable
 
       - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
         run: |
-          mkdir -p dist
-          go build -v -o dist/crlancli-${{ matrix.goos }}-${{ matrix.arch }} ./...
-        shell: bash
-
-      - name: Upload artifact
+          go build
+      - name: Upload Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: crlancli-${{ matrix.goos }}-${{ matrix.arch }}
-          path: dist/crlancli-${{ matrix.goos }}-${{ matrix.arch }}
+          name: crlancli-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
+          path: crlancli${{ matrix.goos == 'windows' && '.exe' || '' }}
