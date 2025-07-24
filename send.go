@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/urfave/cli/v3"
 )
@@ -68,6 +69,7 @@ func SendAction(con context.Context, cmd *cli.Command) error {
 	fmt.Println("file has been transferred to the printer with the name", name)
 
 	if cmd.Bool("print") {
+		time.Sleep(3 * time.Second)
 		pws := NewPrinterWebsocket(cmd.StringArg("printer"))
 		err := pws.ModifyFile(name, "print")
 		if err != nil {
