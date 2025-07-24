@@ -1,0 +1,53 @@
+name: build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [windows, linux, darwin]
+        goarch: [amd64, arm, arm64, 386]
+        exclude:
+          - goos: windows
+            goarch: arm
+          - goos: windows
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm
+          - goos: darwin
+            goarch: 386
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          go build
+      - name: Upload Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: crlancli-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
+          path: crlancli${{ matrix.goos == 'windows' && '.exe' || '' }}
