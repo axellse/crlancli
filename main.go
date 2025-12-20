@@ -14,6 +14,18 @@ func main() {
 		Usage: "interact with networked creality printers",
 		Commands: []*cli.Command{
 			{
+				Name:  "scan",
+				Usage: "scans the network for any printers",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name: "long",
+						Aliases: []string{"l"},
+						Usage: "scans for 15 seconds instead of just 3",
+					},
+				},
+				Action: ScanForPrinters,
+			},
+			{
 				Name:  "send",
 				Usage: "transfer a gcode file to a printer",
 				Arguments: []cli.Argument{
@@ -27,6 +39,11 @@ func main() {
 					},
 				},
 				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name: "print",
+						Aliases: []string{"p"},
+						Usage: "whether or not to start printing the file after transferring",
+					},
 					&cli.BoolFlag{
 						Name: "print",
 						Aliases: []string{"p"},

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"errors"
 	"strings"
 
 	"golang.org/x/net/websocket"
@@ -15,6 +15,7 @@ type printerSocketRequest struct {
 
 type PrinterSocket struct {
 	ws *websocket.Conn
+	InitalFrame InitalWSResponse
 }
 
 
@@ -38,6 +39,11 @@ func (ps PrinterSocket) SendRawQuery(method string, params map[string]any) error
 	return nil
 }
 
+//closes the socket
+func (ps PrinterSocket) Close() error {
+	return ps.ws.Close()
+}
+
 //modifies a gcode file (delete, rename, print)
 func (ps PrinterSocket) ModifyFile(file string, action string) error {
 	return ps.SendRawQuery("set", map[string]any{
@@ -45,13 +51,20 @@ func (ps PrinterSocket) ModifyFile(file string, action string) error {
 	})
 }
 
-func NewPrinterWebsocket(url string) PrinterSocket {
+func NewPrinterWebsocket(url string) (PrinterSocket, error) {
 	ws, err := websocket.Dial("ws://" + url + ":9999", "", "http://" + url)
 	if err != nil {
-		log.Fatal("could not create printer websocket, is the printer online?", err)
+		return PrinterSocket{}, errors.New("could not create printer websocket, is the printer online?\n" + err.Error())
+	}
+
+	var InitalData InitalWSResponse
+	err = websocket.JSON.Receive(ws, &InitalData)
+	if err != nil {
+		return PrinterSocket{}, errors.New("failed receiving initial frame from websocket, what?\n" + err.Error())
 	}
 
 	return PrinterSocket{
 		ws: ws,
-	}
+		InitalFrame: InitalData,
+	}, nil
 }
