@@ -72,7 +72,8 @@ func SendAction(con context.Context, cmd *cli.Command) error {
 		time.Sleep(3 * time.Second)
 		pws, err := NewPrinterWebsocket(cmd.StringArg("printer"))
 		if err != nil {
-			
+			fmt.Println("error: printer reported ws error:", err)
+			return err
 		}
 		err = pws.ModifyFile(name, "print")
 		if err != nil {

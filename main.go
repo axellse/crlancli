@@ -26,6 +26,17 @@ func main() {
 				Action: ScanForPrinters,
 			},
 			{
+				Name:  "temp",
+				Usage: "temprature readings for a printer",
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name: "printer",
+						UsageText: "[printer ip address/hostname, eg. 192.168.1.218] ",
+					},
+				},
+				Action: TempAction,
+			},
+			{
 				Name:  "send",
 				Usage: "transfer a gcode file to a printer",
 				Arguments: []cli.Argument{
@@ -39,11 +50,6 @@ func main() {
 					},
 				},
 				Flags: []cli.Flag{
-					&cli.BoolFlag{
-						Name: "print",
-						Aliases: []string{"p"},
-						Usage: "whether or not to start printing the file after transferring",
-					},
 					&cli.BoolFlag{
 						Name: "print",
 						Aliases: []string{"p"},
