@@ -1,4 +1,4 @@
-module axell.me/crlancli
+module github.com/axellse/crlancli
 
 go 1.24.4
 
