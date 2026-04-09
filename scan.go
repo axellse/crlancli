@@ -22,7 +22,7 @@ func ScanForPrinters(con context.Context, cmd *cli.Command) error {
 	ips := []net.IP{}
 	ifaces := []string{}
 	for _, i := range interfaces {
-		if i.Flags & net.FlagLoopback != 0 {
+		if i.Flags&net.FlagLoopback != 0 {
 			continue
 		}
 
@@ -49,8 +49,8 @@ func ScanForPrinters(con context.Context, cmd *cli.Command) error {
 		ipInt := binary.BigEndian.Uint32(rawIp)
 		maskInt := binary.BigEndian.Uint32(masks[i])
 
-		start := (ipInt & maskInt) +1
-		end := (start | ^maskInt) -1
+		start := (ipInt & maskInt) + 1
+		end := (start | ^maskInt) - 1
 
 		for rip := start; rip < end; rip++ {
 			ip := make(net.IP, 4)
@@ -59,7 +59,7 @@ func ScanForPrinters(con context.Context, cmd *cli.Command) error {
 			go func() {
 				socket, err := NewPrinterWebsocket(ip.String())
 				if err != nil {
-					return 
+					return
 				}
 
 				model, ok := Models[socket.InitalFrame.Model]
@@ -72,8 +72,7 @@ func ScanForPrinters(con context.Context, cmd *cli.Command) error {
 					modelColor = "\u001b[0"
 				}
 
-
-				printers = append(printers, "Found " + modelColor + model + "\u001b[0m: \u001b[0;32m" + socket.InitalFrame.Hostname + "\u001b[0m (\u001b[0;32m" + ip.String() + "\u001b[0m)")			
+				printers = append(printers, "Found "+modelColor+model+"\u001b[0m: \u001b[0;32m"+socket.InitalFrame.Hostname+"\u001b[0m (\u001b[0;32m"+ip.String()+"\u001b[0m)")
 				socket.Close()
 			}()
 		}
@@ -85,12 +84,12 @@ func ScanForPrinters(con context.Context, cmd *cli.Command) error {
 	}
 	for i := range scanTime {
 		fmt.Print("\u001b[2K\r")
-		fmt.Print("Scanning ", len(ifaces), " interface(s) for printers (" + strconv.FormatFloat(float64(scanTime - i) / 10, 'g', -1, 64) + "sec left)")
+		fmt.Print("Scanning ", len(ifaces), " interface(s) for printers ("+strconv.FormatFloat(float64(scanTime-i)/10, 'g', -1, 64)+"sec left)")
 		time.Sleep(100 * time.Millisecond)
 	}
 	fmt.Print("\u001b[2K\r")
 
-	fmt.Println("Found", len(printers), "printers in", time.Since(startTime).Round(10 * time.Millisecond).Seconds(), "seconds:")
+	fmt.Println("Found", len(printers), "printers in", time.Since(startTime).Round(10*time.Millisecond).Seconds(), "seconds:")
 	fmt.Println(strings.Join(printers, "\n"))
 
 	return nil

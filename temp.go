@@ -19,10 +19,10 @@ func roundStr(input string) string {
 }
 
 type Thermostat struct {
-	Name string
+	Name    string
 	Reading string
-	Target string
-	Max string
+	Target  string
+	Max     string
 }
 
 func TempAction(con context.Context, cmd *cli.Command) error {
@@ -34,40 +34,42 @@ func TempAction(con context.Context, cmd *cli.Command) error {
 
 	tstats := []Thermostat{
 		{
-			Name: "Bed 1: ",
+			Name:    "Bed 1: ",
 			Reading: pws.InitalFrame.BedTemp0,
-			Target: strconv.Itoa(pws.InitalFrame.TargetBedTemp0),
-			Max: strconv.Itoa(pws.InitalFrame.MaxBedTemp),
+			Target:  strconv.Itoa(pws.InitalFrame.TargetBedTemp0),
+			Max:     strconv.Itoa(pws.InitalFrame.MaxBedTemp),
 		},
 		{
-			Name: "Bed 2: ",
+			Name:    "Bed 2: ",
 			Reading: pws.InitalFrame.BedTemp1,
-			Target: strconv.Itoa(pws.InitalFrame.TargetBedTemp1),
-			Max: strconv.Itoa(pws.InitalFrame.MaxBedTemp),
+			Target:  strconv.Itoa(pws.InitalFrame.TargetBedTemp1),
+			Max:     strconv.Itoa(pws.InitalFrame.MaxBedTemp),
 		},
 		{
-			Name: "Bed 3: ",
+			Name:    "Bed 3: ",
 			Reading: pws.InitalFrame.BedTemp2,
-			Target: strconv.Itoa(pws.InitalFrame.TargetBedTemp2),
-			Max: strconv.Itoa(pws.InitalFrame.MaxBedTemp),
+			Target:  strconv.Itoa(pws.InitalFrame.TargetBedTemp2),
+			Max:     strconv.Itoa(pws.InitalFrame.MaxBedTemp),
 		},
 		{
-			Name: "Nozzle:",
+			Name:    "Nozzle:",
 			Reading: pws.InitalFrame.NozzleTemp,
-			Target: strconv.Itoa(pws.InitalFrame.TargetNozzleTemp),
-			Max: strconv.Itoa(pws.InitalFrame.MaxNozzleTemp),
+			Target:  strconv.Itoa(pws.InitalFrame.TargetNozzleTemp),
+			Max:     strconv.Itoa(pws.InitalFrame.MaxNozzleTemp),
 		},
 		{
-			Name: "Box:   ",
+			Name:    "Box:   ",
 			Reading: strconv.Itoa(pws.InitalFrame.BoxTemp),
-			Target: "N/A",
-			Max: "N/A",
+			Target:  "N/A",
+			Max:     "N/A",
 		},
 	}
 
 	for _, t := range tstats {
-		if roundStr(t.Reading) == "0" {continue}
-		fmt.Println(t.Name + "\u001b[0;32m", roundStr(t.Reading) + "°", "\u001b[0m→\u001b[0;31m", roundStr(t.Target) + "°", "\u001b[0m(Max " + roundStr(t.Max) + "°)")
+		if roundStr(t.Reading) == "0" {
+			continue
+		}
+		fmt.Println(t.Name+"\u001b[0;32m", roundStr(t.Reading)+"°", "\u001b[0m→\u001b[0;31m", roundStr(t.Target)+"°", "\u001b[0m(Max "+roundStr(t.Max)+"°)")
 	}
 
 	return pws.Close()

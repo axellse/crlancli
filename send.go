@@ -66,7 +66,7 @@ func SendAction(con context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	fmt.Println(Success + "File has been transferred to the printer with the name", name)
+	fmt.Println(Success+"File has been transferred to the printer with the name", name)
 
 	if cmd.Bool("print") {
 		time.Sleep(3 * time.Second)

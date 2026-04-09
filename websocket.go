@@ -9,17 +9,16 @@ import (
 )
 
 type printerSocketRequest struct {
-	Method string `json:"method"`
+	Method string         `json:"method"`
 	Params map[string]any `json:"params"`
 }
 
 type PrinterSocket struct {
-	ws *websocket.Conn
+	ws          *websocket.Conn
 	InitalFrame InitalWSResponse
 }
 
-
-//sends a raw query to the printer
+// sends a raw query to the printer
 func (ps PrinterSocket) SendRawQuery(method string, params map[string]any) error {
 	payload := printerSocketRequest{
 		Method: method,
@@ -39,20 +38,20 @@ func (ps PrinterSocket) SendRawQuery(method string, params map[string]any) error
 	return nil
 }
 
-//closes the socket
+// closes the socket
 func (ps PrinterSocket) Close() error {
 	return ps.ws.Close()
 }
 
-//modifies a gcode file (delete, rename, print)
+// modifies a gcode file (delete, rename, print)
 func (ps PrinterSocket) ModifyFile(file string, action string) error {
 	return ps.SendRawQuery("set", map[string]any{
-		"opGcodeFile" : strings.ToLower(action) + "prt:/usr/data/printer_data/gcodes/" + file,
+		"opGcodeFile": strings.ToLower(action) + "prt:/usr/data/printer_data/gcodes/" + file,
 	})
 }
 
 func NewPrinterWebsocket(url string) (PrinterSocket, error) {
-	ws, err := websocket.Dial("ws://" + url + ":9999", "", "http://" + url)
+	ws, err := websocket.Dial("ws://"+url+":9999", "", "http://"+url)
 	if err != nil {
 		return PrinterSocket{}, errors.New("could not create printer websocket, is the printer online?\n" + err.Error())
 	}
@@ -64,7 +63,7 @@ func NewPrinterWebsocket(url string) (PrinterSocket, error) {
 	}
 
 	return PrinterSocket{
-		ws: ws,
+		ws:          ws,
 		InitalFrame: InitalData,
 	}, nil
 }
